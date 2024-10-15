@@ -17,6 +17,8 @@ volumes:
     driver: local
   logstashdata01:
     driver: local
+  fleetserverdata:
+    driver: local
 
 networks:
   default:
@@ -25,7 +27,7 @@ networks:
 
 services:
   setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
     user: "0"
@@ -77,6 +79,12 @@ services:
           "      - localhost\n"\
           "    ip:\n"\
           "      - 127.0.0.1\n"\
+          "  - name: fleet-server\n"\
+          "    dns:\n"\
+          "      - fleet-server\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
           > config/certs/instances.yml;
           bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
           unzip config/certs/certs.zip -d config/certs;
@@ -101,7 +109,7 @@ services:
     depends_on:
       setup:
         condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     labels:
       co.elastic.logs/module: elasticsearch
     volumes:
@@ -144,19 +152,21 @@ services:
 
   dedaleiro02:
     depends_on:
-      dedaleiro01: 
+      dedaleiro01:
         condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     labels:
       co.elastic.logs/module: elasticsearch
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - dedaleirodata02:/usr/share/elasticsearch/data
+    ports:
+      - 9202:9200
     environment:
       - node.name=dedaleiro02
       - cluster.name=${CLUSTER_NAME}
-      - cluster.initial_master_nodes=dedaleiro01,dedaleiro02,dedaleiro03,dedaleiro04
-      - discovery.seed_hosts=dedaleiro01,dedaleiro03,dedaleiro04
+      - cluster.initial_master_nodes=dedaleiro01,dedaleiro02,dedaleiro03,dedaleiro4
+      - discovery.seed_hosts=dedaleiro01,dedaleiro03,dedaleiro4
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - bootstrap.memory_lock=true
       - xpack.security.enabled=true
@@ -187,25 +197,27 @@ services:
 
   dedaleiro03:
     depends_on:
-      dedaleiro02: 
+      dedaleiro02:
         condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     labels:
       co.elastic.logs/module: elasticsearch
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - dedaleirodata03:/usr/share/elasticsearch/data
+    ports:
+      - 9203:9200
     environment:
       - node.name=dedaleiro03
       - cluster.name=${CLUSTER_NAME}
-      - cluster.initial_master_nodes=dedaleiro01,dedaleiro02,dedaleiro03,dedaleiro04
-      - discovery.seed_hosts=dedaleiro01,dedaleiro2,dedaleiro04
+      - cluster.initial_master_nodes=dedaleiro01,dedaleiro02,dedaleiro03,dedaleiro4
+      - discovery.seed_hosts=dedaleiro01,dedaleiro02,dedaleiro4
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - bootstrap.memory_lock=true
       - xpack.security.enabled=true
       - xpack.security.http.ssl.enabled=true
       - xpack.security.http.ssl.key=certs/dedaleiro03/dedaleiro03.key
-      - xpack.security.http.ssl.certificate=certs/dedaleiro02/dedaleiro02.crt
+      - xpack.security.http.ssl.certificate=certs/dedaleiro03/dedaleiro03.crt
       - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.enabled=true
       - xpack.security.transport.ssl.key=certs/dedaleiro03/dedaleiro03.key
@@ -230,19 +242,21 @@ services:
 
   dedaleiro04:
     depends_on:
-      dedaleiro03: 
+      dedaleiro03:
         condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     labels:
       co.elastic.logs/module: elasticsearch
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - dedaleirodata04:/usr/share/elasticsearch/data
+    ports:
+      - 9204:9200
     environment:
-      - node.name=dedaleiro03
+      - node.name=dedaleiro04
       - cluster.name=${CLUSTER_NAME}
-      - cluster.initial_master_nodes=dedaleiro01,dedaleiro02,dedaleiro03,dedaleiro04
-      - discovery.seed_hosts=dedaleiro01,dedaleiro2,dedaleiro03
+      - cluster.initial_master_nodes=dedaleiro01,dedaleiro02,dedaleiro03,dedaleiro4
+      - discovery.seed_hosts=dedaleiro01,dedaleiro02,dedaleiro3
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - bootstrap.memory_lock=true
       - xpack.security.enabled=true
@@ -281,12 +295,13 @@ services:
         condition: service_healthy
       dedaleiro04:
         condition: service_healthy
-    image: docker.elastic.co/kibana/kibana:8.15.2
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     labels:
       co.elastic.logs/module: kibana
     volumes:
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -298,12 +313,18 @@ services:
       - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
       - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
       - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
+      - XPACK_REPORTING_KIBANASERVER_HOSTNAME=localhost
+      - SERVER_SSL_ENABLED=true
+      - SERVER_SSL_CERTIFICATE=config/certs/kibana/kibana.crt
+      - SERVER_SSL_KEY=config/certs/kibana/kibana.key
+      - SERVER_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+      - ELASTIC_APM_SECRET_TOKEN=${ELASTIC_APM_SECRET_TOKEN}
     mem_limit: ${KB_MEM_LIMIT}
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+          "curl -I -s --cacert config/certs/ca/ca.crt https://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
         ]
       interval: 10s
       timeout: 10s
@@ -313,15 +334,9 @@ services:
     depends_on:
       dedaleiro01:
         condition: service_healthy
-      dedaleiro02:
-        condition: service_healthy
-      dedaleiro03:
-        condition: service_healthy
-      dedaleiro04:
-        condition: service_healthy
       kibana:
         condition: service_healthy
-    image: docker.elastic.co/beats/metricbeat:8.15.2
+    image: docker.elastic.co/beats/metricbeat:${STACK_VERSION}
     user: root
     volumes:
       - certs:/usr/share/metricbeat/certs
@@ -335,22 +350,21 @@ services:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://dedaleiro01:9200
-      - KIBANA_HOSTS=http://kibana:5601
+      - KIBANA_HOSTS=https://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
+      - CA_CERT=certs/ca/ca.crt
+      - ES_CERT=certs/dedaleiro01/dedaleiro01.crt
+      - ES_KEY=certs/dedaleiro01/dedaleiro01.key
+      - KB_CERT=certs/kibana/kibana.crt
+      - KB_KEY=certs/kibana/kibana.key
     command:
-      - strict.perms=false
+      -strict.perms=false
 
   filebeat01:
     depends_on:
       dedaleiro01:
         condition: service_healthy
-      dedaleiro02:
-        condition: service_healthy
-      dedaleiro03:
-        condition: service_healthy
-      dedaleiro04:
-        condition: service_healthy
-    image: docker.elastic.co/beats/filebeat:8.15.2
+    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
     user: root
     volumes:
       - certs:/usr/share/filebeat/certs
@@ -363,24 +377,19 @@ services:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://dedaleiro01:9200
-      - KIBANA_HOSTS=http://kibana:5601
+      - KIBANA_HOSTS=https://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
+      - CA_CERT=certs/ca/ca.crt
     command:
-      - strict.perms=false
+      -strict.perms=false
 
   logstash01:
     depends_on:
       dedaleiro01:
         condition: service_healthy
-      dedaleiro02:
-        condition: service_healthy
-      dedaleiro03:
-        condition: service_healthy
-      dedaleiro04:
-        condition: service_healthy
       kibana:
         condition: service_healthy
-    image: docker.elastic.co/logstash/logstash:8.15.2
+    image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
     labels:
       co.elastic.logs/module: logstash
     user: root
@@ -394,5 +403,55 @@ services:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://dedaleiro01:9200
-    command:
-      - strict.perms=false
+
+  fleet-server:
+    depends_on:
+      kibana:
+        condition: service_healthy
+      dedaleiro01:
+        condition: service_healthy
+    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+    volumes:
+      - certs:/certs
+      - fleetserverdata:/usr/share/elastic-agent
+      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
+      - "/proc:/hostfs/proc:ro"
+      - "/:/hostfs:ro"
+    ports:
+      - ${FLEET_PORT}:8220
+      - ${APMSERVER_PORT}:8200
+    user: root
+    environment:
+      - SSL_CERTIFICATE_AUTHORITIES=/certs/ca/ca.crt
+      - CERTIFICATE_AUTHORITIES=/certs/ca/ca.crt
+      - FLEET_CA=/certs/ca/ca.crt
+      - FLEET_ENROLL=1
+      - FLEET_INSECURE=true
+      - FLEET_SERVER_ELASTICSEARCH_CA=/certs/ca/ca.crt
+      - FLEET_SERVER_ELASTICSEARCH_HOST=https://dedaleiro01:9200
+      - FLEET_SERVER_ELASTICSEARCH_INSECURE=true
+      - FLEET_SERVER_ENABLE=1
+      - FLEET_SERVER_CERT=/certs/fleet-server/fleet-server.crt
+      - FLEET_SERVER_CERT_KEY=/certs/fleet-server/fleet-server.key
+      - FLEET_SERVER_INSECURE_HTTP=true
+      - FLEET_SERVER_POLICY_ID=fleet-server-policy
+      - FLEET_URL=https://fleet-server:8220
+      - KIBANA_FLEET_CA=/certs/ca/ca.crt
+      - KIBANA_FLEET_SETUP=1
+      - KIBANA_FLEET_USERNAME=elastic
+      - KIBANA_FLEET_PASSWORD=${ELASTIC_PASSWORD}
+      - KIBANA_HOST=https://kibana:5601
+
+  webapp:
+    build:
+      context: app
+    volumes:
+      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
+      - "/proc:/hostfs/proc:ro"
+      - "/:/hostfs:ro"
+    ports:
+      - 8000:8000
