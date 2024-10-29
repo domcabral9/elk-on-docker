@@ -301,7 +301,7 @@ services:
     volumes:
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
-      - ./kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -313,18 +313,18 @@ services:
       - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
       - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
       - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-      - XPACK_REPORTING_KIBANASERVER_HOSTNAME=localhost
-      - SERVER_SSL_ENABLED=true
-      - SERVER_SSL_CERTIFICATE=config/certs/kibana/kibana.crt
-      - SERVER_SSL_KEY=config/certs/kibana/kibana.key
-      - SERVER_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+      - XPACK_REPORTING_KIBANASERVER_HOSTNAME=kibana
+      - SERVER_SSL_ENABLED=false
+      #- SERVER_SSL_CERTIFICATE=config/certs/kibana/kibana.crt
+      #- SERVER_SSL_KEY=config/certs/kibana/kibana.key
+      #- SERVER_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
       - ELASTIC_APM_SECRET_TOKEN=${ELASTIC_APM_SECRET_TOKEN}
     mem_limit: ${KB_MEM_LIMIT}
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "curl -I -s --cacert config/certs/ca/ca.crt https://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+          "curl -I -s --cacert config/certs/ca/ca.crt http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
         ]
       interval: 10s
       timeout: 10s
@@ -341,22 +341,22 @@ services:
     volumes:
       - certs:/usr/share/metricbeat/certs
       - metricbeatdata01:/usr/share/metricbeat/data
-      - "./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
-      - "/proc:/hostfs/proc:ro"
-      - "/:/hostfs:ro"
+      - "./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup"
+      - "/proc:/hostfs/proc"
+      - "/:/hostfs"
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://dedaleiro01:9200
-      - KIBANA_HOSTS=https://kibana:5601
+      - KIBANA_HOSTS=http://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
       - CA_CERT=certs/ca/ca.crt
       - ES_CERT=certs/dedaleiro01/dedaleiro01.crt
       - ES_KEY=certs/dedaleiro01/dedaleiro01.key
-      - KB_CERT=certs/kibana/kibana.crt
-      - KB_KEY=certs/kibana/kibana.key
+      #- KB_CERT=certs/kibana/kibana.crt
+      #- KB_KEY=certs/kibana/kibana.key
     command:
       -strict.perms=false
 
@@ -364,24 +364,30 @@ services:
     depends_on:
       dedaleiro01:
         condition: service_healthy
+      kibana:
+        condition: service_healthy
     image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
     user: root
     volumes:
       - certs:/usr/share/filebeat/certs
       - filebeatdata01:/usr/share/filebeat/data
       - "./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/"
-      - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
-      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./filebeat.yml:/usr/share/filebeat/filebeat.yml"
+      - "/var/lib/docker/containers:/var/lib/docker/containers"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://dedaleiro01:9200
-      - KIBANA_HOSTS=https://kibana:5601
+      - KIBANA_HOSTS=http://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
       - CA_CERT=certs/ca/ca.crt
     command:
       -strict.perms=false
+    ports:
+      - "5045:5045/udp"
+      - "9004:9004/udp"
+    mem_limit: ${FB_MEM_LIMIT}
 
   logstash01:
     depends_on:
@@ -397,13 +403,15 @@ services:
       - certs:/usr/share/logstash/certs
       - logstashdata01:/usr/share/logstash/data
       - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
-      - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+      - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf"
+      - "./f5.conf:/usr/share/logstash/pipeline/f5.conf"
     environment:
       - xpack.monitoring.enabled=false
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://dedaleiro01:9200
-    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
+    command: 
+      -logstash -f /usr/share/logstash/pipeline/logstash.conf
     ports:
       - "5044:5044/udp"
     mem_limit: ${LS_MEM_LIMIT}
@@ -418,11 +426,11 @@ services:
     volumes:
       - certs:/certs
       - fleetserverdata:/usr/share/elastic-agent
-      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
-      - "/proc:/hostfs/proc:ro"
-      - "/:/hostfs:ro"
+      - "/var/lib/docker/containers:/var/lib/docker/containers"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup"
+      - "/proc:/hostfs/proc"
+      - "/:/hostfs"
     ports:
       - ${FLEET_PORT}:8220
       - ${APMSERVER_PORT}:8200
@@ -441,21 +449,21 @@ services:
       - FLEET_SERVER_CERT_KEY=/certs/fleet-server/fleet-server.key
       - FLEET_SERVER_INSECURE_HTTP=true
       - FLEET_SERVER_POLICY_ID=fleet-server-policy
-      - FLEET_URL=https://fleet-server:8220
+      - FLEET_URL=http://fleet-server:8220
       - KIBANA_FLEET_CA=/certs/ca/ca.crt
       - KIBANA_FLEET_SETUP=1
       - KIBANA_FLEET_USERNAME=elastic
       - KIBANA_FLEET_PASSWORD=${ELASTIC_PASSWORD}
-      - KIBANA_HOST=https://kibana:5601
+      - KIBANA_HOST=http://kibana:5601
 
   webapp:
     build:
       context: app
     volumes:
-      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
-      - "/proc:/hostfs/proc:ro"
-      - "/:/hostfs:ro"
+      - "/var/lib/docker/containers:/var/lib/docker/containers"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup"
+      - "/proc:/hostfs/proc"
+      - "/:/hostfs"
     ports:
       - 8000:8000
