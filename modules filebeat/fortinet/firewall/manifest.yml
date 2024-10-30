@@ -6,7 +6,7 @@ var:
   - name: tags
     default: [fortinet-firewall, forwarded]
   - name: syslog_port
-    default: 5044
+    default: 9004
   - name: input
     default: udp
   - name: internal_interfaces

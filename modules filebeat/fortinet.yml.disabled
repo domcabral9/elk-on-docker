@@ -31,7 +31,7 @@
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
     # var.syslog_host: localhost
-     var.syslog_port: 5045
+     var.syslog_port: 9004
 
     # Set paths for the log files when file input is used.
     # var.paths:
@@ -50,7 +50,7 @@
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
     # var.syslog_host: localhost
-     var.syslog_port: 5045
+     var.syslog_port: 9004
 
     # Set paths for the log files when file input is used.
     # var.paths:
@@ -69,7 +69,7 @@
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
     # var.syslog_host: localhost
-     var.syslog_port: 5045
+     var.syslog_port: 9004
 
     # Set paths for the log files when file input is used.
     # var.paths:
