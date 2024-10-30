@@ -218,7 +218,7 @@ services:
       -strict.perms=false
     ports:
       - "5045:5045/udp"
-      - "9004:9004/udp"
+
     mem_limit: ${FB_MEM_LIMIT}
 
   logstash01:
@@ -242,6 +242,7 @@ services:
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://es01:9200
     ports:
+      - "9004:9004/udp"
       - "5044:5044/udp"
     mem_limit: ${LS_MEM_LIMIT}
 
