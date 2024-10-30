@@ -99,16 +99,16 @@ services:
       - discovery.type=single-node
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - bootstrap.memory_lock=true
-      - xpack.security.enabled=false
-      - xpack.security.http.ssl.enabled=false
-      # - xpack.security.http.ssl.key=certs/es01/es01.key
-      # - xpack.security.http.ssl.certificate=certs/es01/es01.crt
-      # - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
-      - xpack.security.transport.ssl.enabled=false
-      # - xpack.security.transport.ssl.key=certs/es01/es01.key
-      # - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
-      # - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
-      # - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es01/es01.key
+      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es01/es01.key
+      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
     mem_limit: ${ES_MEM_LIMIT}
     ulimits:
@@ -119,7 +119,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          # "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
         ]
       interval: 10s
       timeout: 10s
@@ -140,7 +140,7 @@ services:
       - ${KIBANA_PORT}:5601
     environment:
       - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=http://es01:9200
+      - ELASTICSEARCH_HOSTS=https://es01:9200
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       # - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
@@ -183,7 +183,7 @@ services:
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - ELASTIC_HOSTS=http://es01:9200
+      - ELASTIC_HOSTS=https://es01:9200
       - KIBANA_HOSTS=http://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
       # - CA_CERT=certs/ca/ca.crt
@@ -210,7 +210,7 @@ services:
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - ELASTIC_HOSTS=http://es01:9200
+      - ELASTIC_HOSTS=https://es01:9200
       - KIBANA_HOSTS=http://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
       # - CA_CERT=certs/ca/ca.crt
@@ -240,7 +240,7 @@ services:
       - xpack.monitoring.enabled=false
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - ELASTIC_HOSTS=http://es01:9200
+      - ELASTIC_HOSTS=https://es01:9200
     ports:
       - "5044:5044/udp"
     mem_limit: ${LS_MEM_LIMIT}
@@ -271,7 +271,7 @@ services:
       - FLEET_ENROLL=1
       - FLEET_INSECURE=true
       # - FLEET_SERVER_ELASTICSEARCH_CA=/certs/ca/ca.crt
-      - FLEET_SERVER_ELASTICSEARCH_HOST=http://es01:9200
+      - FLEET_SERVER_ELASTICSEARCH_HOST=https://es01:9200
       - FLEET_SERVER_ELASTICSEARCH_INSECURE=true
       - FLEET_SERVER_ENABLE=1
       # - FLEET_SERVER_CERT=/certs/fleet-server/fleet-server.crt
