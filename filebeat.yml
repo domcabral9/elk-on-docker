@@ -1,12 +1,8 @@
-filebeat.config.modules:
-  enabled: true
-  path: /usr/share/filebeat/modules.d/*.yml
-
 filebeat.inputs:
-- type: log
-  #id: logstash-filestream
+- type: filestream
+  id: default-filestream
   paths:
-    - /usr/share/filebeat/mylog/*log
+    - ingest_data/*.log
 
 filebeat.autodiscover:
   providers:
@@ -19,14 +15,15 @@ processors:
 setup.kibana:
   host: ${KIBANA_HOSTS}
   username: ${ELASTIC_USER}
-  password: ${ELASTIC_PASSWORD}
-  setup.kibana.ssl.verification_mode: "none"
-  setup.kibana.ssl.certificate_authorities: "certs/ca/ca.crt"
+  password: ${ELASTIC_PASSWORD} 
 
 output.logstash:
   hosts: [logstash01:5044]
-  #username: ${ELASTIC_USER}
-  #password: ${ELASTIC_PASSWORD}
-  #ssl.enabled: true
-  #ssl.certificate_authorities: "certs/ca/ca.crt"
   
+# output.elasticsearch:
+#   hosts: ${ELASTIC_HOSTS}
+#   username: ${ELASTIC_USER}
+#   password: ${ELASTIC_PASSWORD}
+#   ssl:
+#     enabled: true
+#     certificate_authorities: ${CA_CERT}

@@ -1,4 +1,4 @@
-docker cp elk-dedaleiro-01-1:/usr/share/elasticsearch/config/certs/ca/ca.crt /tmp/.
+docker cp es-es01-1:/usr/share/elasticsearch/config/certs/ca/ca.crt /tmp/.
 cat /tmp/ca.crt
 echo 'ssl:';
 echo '  certificate_authorities:';
