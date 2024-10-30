@@ -143,7 +143,7 @@ services:
       - ELASTICSEARCH_HOSTS=https://es01:9200
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-      # - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
       - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
       - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${ENCRYPTION_KEY}
       - XPACK_REPORTING_ENCRYPTIONKEY=${ENCRYPTION_KEY}
@@ -158,7 +158,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          # "curl -I -s --cacert config/certs/ca/ca.crt https://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+          "curl -I -s http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
         ]
       interval: 10s
       timeout: 10s
@@ -186,9 +186,9 @@ services:
       - ELASTIC_HOSTS=https://es01:9200
       - KIBANA_HOSTS=http://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
-      # - CA_CERT=certs/ca/ca.crt
-      # - ES_CERT=certs/es01/es01.crt
-      # - ES_KEY=certs/es01/es01.key
+      - CA_CERT=certs/ca/ca.crt
+      - ES_CERT=certs/es01/es01.crt
+      - ES_KEY=certs/es01/es01.key
       # - KB_CERT=certs/kibana/kibana.crt
       # - KB_KEY=certs/kibana/kibana.key
     command:
@@ -213,7 +213,7 @@ services:
       - ELASTIC_HOSTS=https://es01:9200
       - KIBANA_HOSTS=http://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
-      # - CA_CERT=certs/ca/ca.crt
+      - CA_CERT=certs/ca/ca.crt
     command:
       -strict.perms=false
     ports:
@@ -265,12 +265,12 @@ services:
       - ${APMSERVER_PORT}:8200
     user: root
     environment:
-      # - SSL_CERTIFICATE_AUTHORITIES=/certs/ca/ca.crt
-      # - CERTIFICATE_AUTHORITIES=/certs/ca/ca.crt
-      # - FLEET_CA=/certs/ca/ca.crt
+      - SSL_CERTIFICATE_AUTHORITIES=/certs/ca/ca.crt
+      - CERTIFICATE_AUTHORITIES=/certs/ca/ca.crt
+      - FLEET_CA=/certs/ca/ca.crt
       - FLEET_ENROLL=1
       - FLEET_INSECURE=true
-      # - FLEET_SERVER_ELASTICSEARCH_CA=/certs/ca/ca.crt
+      - FLEET_SERVER_ELASTICSEARCH_CA=/certs/ca/ca.crt
       - FLEET_SERVER_ELASTICSEARCH_HOST=https://es01:9200
       - FLEET_SERVER_ELASTICSEARCH_INSECURE=true
       - FLEET_SERVER_ENABLE=1
