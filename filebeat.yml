@@ -3,10 +3,16 @@ filebeat.config.modules:
   path: /usr/share/filebeat/modules.d/*.yml
 
 filebeat.inputs:
-- type: filestream
-  id: default-filestream
-  paths:
-    - ingest_data/*.log
+- type: syslog
+  format: rfc3164
+  protocol.udp:
+    host: "172.16.200.33:9528"
+
+# filebeat.inputs:
+# - type: filestream
+#   id: default-filestream
+#   paths:
+#     - ingest_data/*.log
 
 filebeat.autodiscover:
   providers:
