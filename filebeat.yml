@@ -5,8 +5,8 @@ filebeat.config.modules:
 filebeat.inputs:
 - type: syslog
   format: rfc3164
-  protocol.udp:
-    host: "localhost:9528"
+  # protocol.udp:
+  #   host: "localhost:9528"
 
 # filebeat.inputs:
 # - type: filestream
