@@ -6,7 +6,7 @@ filebeat.inputs:
 - type: syslog
   format: rfc3164
   protocol.udp:
-    host: "172.16.200.33:9528"
+    host: "localhost:9528"
 
 # filebeat.inputs:
 # - type: filestream
