@@ -1,7 +1,7 @@
 elastic:
   apm:
     active: true
-    serverUrl: "http://fleet-server:8200"
+    serverUrl: "https://dedaleiro-fleet.setic.ro.gov.br:8200"
     secretToken: ${ELASTIC_APM_SECRET_TOKEN}
 server.host: "0.0.0.0"
 telemetry.enabled: "true"
