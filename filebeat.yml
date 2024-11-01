@@ -7,6 +7,10 @@ filebeat.inputs:
   format: rfc3164
   protocol.udp:
   #   host: "localhost:9528"
+- type: udp
+  max_message_size: 10KiB
+  # tags: ["json"]
+  #   host: "localhost:8080"
 
 # filebeat.inputs:
 # - type: filestream
