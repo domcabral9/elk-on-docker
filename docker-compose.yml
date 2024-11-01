@@ -275,7 +275,7 @@ services:
       - FLEET_INSECURE=true
       - FLEET_SERVER_ELASTICSEARCH_CA=/certs/ca/ca.crt
       - FLEET_SERVER_ELASTICSEARCH_HOST=https://dedaleiro-alone.setic.ro.gov.br:9200
-      - FLEET_SERVER_ELASTICSEARCH_INSECURE=false
+      - FLEET_SERVER_ELASTICSEARCH_INSECURE=true
       - FLEET_SERVER_ENABLE=1
       - FLEET_SERVER_CERT=/certs/fleet-server/fleet-server.crt
       - FLEET_SERVER_CERT_KEY=/certs/fleet-server/fleet-server.key
