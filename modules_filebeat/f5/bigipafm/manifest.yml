@@ -5,9 +5,9 @@ var:
   - name: tags
     default: ["f5.bigipafm", "forwarded"]
   - name: syslog_host
-    default: localhost
+    default: 0.0.0.0
   - name: syslog_port
-    default: 5045
+    default: 9528
   - name: input
     default: udp
   - name: community_id
