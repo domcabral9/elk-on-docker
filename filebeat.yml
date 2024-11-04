@@ -29,7 +29,10 @@ processors:
 setup.kibana:
   host: ${KIBANA_HOSTS}
   username: ${ELASTIC_USER}
-  password: ${ELASTIC_PASSWORD} 
+  password: ${ELASTIC_PASSWORD}
+  ssl:
+    enabled: true
+    certificate_authorities: ${CA_CERT} 
 
 output.elasticsearch:
   hosts: ${ELASTIC_HOSTS}
