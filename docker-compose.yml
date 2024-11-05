@@ -240,6 +240,7 @@ services:
       - logstashdata01:/usr/share/logstash/data
       - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
       - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+      - "./logstash.conf:/usr/share/logstash/pipeline/f5.conf:ro"
     environment:
       - xpack.monitoring.enabled=true
       - ELASTIC_USER=elastic
