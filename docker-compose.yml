@@ -239,7 +239,7 @@ services:
       - logstashdata01:/usr/share/logstash/data
       - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
       - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
-      - "./f5.conf:/usr/share/logstash/pipeline/f5.conf:ro"
+      # - "./f5.conf:/usr/share/logstash/pipeline/f5.conf:ro"
     environment:
       - xpack.monitoring.enabled=true
       - ELASTIC_USER=elastic
@@ -247,9 +247,10 @@ services:
       - ELASTIC_HOSTS=https://dedaleiro-alone.setic.ro.gov.br:9200
     command: 
       -logstash -f /usr/share/logstash/pipeline/logstash.conf
-      -logstash -f /usr/share/logstash/pipeline/f5.conf
+      # -logstash -f /usr/share/logstash/pipeline/f5.conf
     ports:
       - "5044:5044/udp"
+      - "5046:5046/udp"
     mem_limit: ${LS_MEM_LIMIT}
 
   fleet-server:
