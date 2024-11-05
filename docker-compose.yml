@@ -222,7 +222,6 @@ services:
       - "5045:5045/udp"
       - "9504:9504/udp"
       - "9528:9528/udp"
-
     mem_limit: ${FB_MEM_LIMIT}
 
   logstash01:
@@ -240,13 +239,15 @@ services:
       - logstashdata01:/usr/share/logstash/data
       - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
       - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
-      - "./logstash.conf:/usr/share/logstash/pipeline/f5.conf:ro"
+      - "./f5.conf:/usr/share/logstash/pipeline/f5.conf:ro"
     environment:
       - xpack.monitoring.enabled=true
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://dedaleiro-alone.setic.ro.gov.br:9200
-    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
+    command: 
+      -logstash -f /usr/share/logstash/pipeline/logstash.conf
+      -logstash -f /usr/share/logstash/pipeline/f5.conf
     ports:
       - "5044:5044/udp"
     mem_limit: ${LS_MEM_LIMIT}
