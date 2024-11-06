@@ -241,7 +241,7 @@ services:
       - logstashdata01:/usr/share/logstash/data
       - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
       - "./pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro"
-      - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+      - "./f5.conf:/usr/share/logstash/pipeline/f5.conf:ro"
       - "./fortigate.conf:/usr/share/logstash/pipeline/fortigate.conf:ro"
     environment:
       - xpack.monitoring.enabled=true
