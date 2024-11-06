@@ -2,7 +2,7 @@
 #   path.config: "/usr/share/logstash/pipeline"
 
 - pipeline.id: big_ip_pipeline
-  path.config: "/usr/share/logstash/pipeline/logstash.conf"
+  path.config: "/usr/share/logstash/pipeline/f5.conf"
 
 - pipeline.id: fortigate_pipeline
   path.config: "/usr/share/logstash/pipeline/fortigate.conf"
