@@ -136,6 +136,7 @@ services:
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
       - ./kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - /etc/localtime:/etc/localtime:ro  # Sincroniza horário com o host
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -153,6 +154,7 @@ services:
       - SERVER_SSL_KEY=config/certs/kibana/kibana.key
       - SERVER_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
       - ELASTIC_APM_SECRET_TOKEN=${ELASTIC_APM_SECRET_TOKEN}
+      - TZ=America/Porto_Velho  # Define o timezone no Kibana
     mem_limit: ${KB_MEM_LIMIT}
     healthcheck:
       test:
