@@ -240,6 +240,7 @@ services:
       - certs:/usr/share/logstash/certs
       - logstashdata01:/usr/share/logstash/data
       - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
+      - "./pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro"
       - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
       - "./fortigate.conf:/usr/share/logstash/pipeline/fortigate.conf:ro"
     environment:
@@ -247,9 +248,7 @@ services:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://dedaleiro-alone.setic.ro.gov.br:9200
-    command: 
-      -logstash -f /usr/share/logstash/pipeline/logstash.conf
-      -logstash -f /usr/share/logstash/pipeline/fortigate.conf
+    command: logstash
     ports:
       - "5044:5044/udp"
       - "5046:5046/udp"
