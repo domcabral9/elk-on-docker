@@ -223,9 +223,10 @@ services:
     command:
       -strict.perms=false
     ports:
-      - "5045:5045/udp"
-      - "9504:9504/udp"
-      - "9528:9528/udp"
+      - "5045:5045/udp" #F5
+      - "9504:9504/udp" #BIFAFM
+      - "9528:9528/udp" #BIGAPM
+      - "2055:2055/udp" #NetFlow
     mem_limit: ${FB_MEM_LIMIT}
 
   logstash01:
