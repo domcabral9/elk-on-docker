@@ -136,7 +136,8 @@ services:
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
       - ./kibana.yml:/usr/share/kibana/config/kibana.yml:ro
-      # - /etc/localtime:/etc/localtime:ro  # Sincroniza horário com o host
+      - "/etc/localtime:/etc/localtime:ro" # Sincroniza o horário do hospedeiro - Dedaleiro.
+      - ./timezone:/etc/timezone:ro" # Arquivo do projeto inserindo o timezone da região.
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -154,7 +155,6 @@ services:
       - SERVER_SSL_KEY=config/certs/kibana/kibana.key
       - SERVER_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
       - ELASTIC_APM_SECRET_TOKEN=${ELASTIC_APM_SECRET_TOKEN}
-      # - TZ=America/Porto_Velho  # Define o timezone no Kibana
     mem_limit: ${KB_MEM_LIMIT}
     healthcheck:
       test:
@@ -211,6 +211,8 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./modules_filebeat/f5.yml:/usr/share/filebeat/modules.d/f5.yml:ro"
       - "./modules_filebeat/f5/bigipafm/manifest.yml:/usr/share/filebeat/module/f5/bigipafm/manifest.yml:ro"
+      - "/etc/localtime:/etc/localtime:ro" # Sincroniza o horário do hospedeiro - Dedaleiro.
+      - ./timezone:/etc/timezone:ro" # Arquivo do projeto inserindo o timezone da região.
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
@@ -243,6 +245,8 @@ services:
       - "./pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro"
       - "./f5.conf:/usr/share/logstash/pipeline/f5.conf:ro"
       - "./fortigate.conf:/usr/share/logstash/pipeline/fortigate.conf:ro"
+      - "/etc/localtime:/etc/localtime:ro" # Sincroniza o horário do hospedeiro - Dedaleiro.
+      - ./timezone:/etc/timezone:ro" # Arquivo do projeto inserindo o timezone da região.
     environment:
       - xpack.monitoring.enabled=true
       - ELASTIC_USER=elastic
