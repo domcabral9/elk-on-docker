@@ -2,11 +2,11 @@ filebeat.config.modules:
   enabled: true
   path: /usr/share/filebeat/modules.d/*.yml
 
-# filebeat.inputs:
-# - type: filestream
-#   id: default-filestream
-#   paths:
-#     - ingest_data/*.log
+filebeat.inputs:
+- type: filestream
+  id: default-filestream
+  paths:
+    - ingest_data/*.log
 
 # filebeat.inputs:
 # - type: syslog
