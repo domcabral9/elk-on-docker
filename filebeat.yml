@@ -19,12 +19,12 @@ filebeat.inputs:
   # tags: ["json"]
   #   host: "localhost:8080"
 
-- type: udp
-  enabled: true
-  # host: "0.0.0.0:2055"  # Porta padrão para NetFlow, altere conforme necessário
-  fields:
-  source: "netflow"
-  fields_under_root: true
+# - type: udp
+#   enabled: true
+#   # host: "0.0.0.0:2055"  # Porta padrão para NetFlow, altere conforme necessário
+#   fields:
+#   source: "netflow"
+#   fields_under_root: true
 
 
 filebeat.autodiscover:
