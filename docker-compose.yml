@@ -212,6 +212,7 @@ services:
       - "./modules_filebeat/f5.yml:/usr/share/filebeat/modules.d/f5.yml:ro"
       - "./modules_filebeat/f5/bigipafm/manifest.yml:/usr/share/filebeat/module/f5/bigipafm/manifest.yml:ro"
       - "./modules_filebeat/netflow.yml:/usr/share/filebeat/modules.d/netflow.yml:ro"
+      - "./modules_filebeat/netflow/log/manifest.yml:/usr/share/filebeat/module/netflow/log/manifest.yml:ro"
       - "/etc/localtime:/etc/localtime:ro" # Sincroniza o horário do hospedeiro - Dedaleiro.
       - ./timezone:/etc/timezone:ro" # Arquivo do projeto inserindo o timezone da região.
     environment:
@@ -224,10 +225,10 @@ services:
     command:
       -strict.perms=false
     ports:
-      - "5045:5045/udp" #F5
-      - "9504:9504/udp" #BIFAFM
-      - "9528:9528/udp" #BIGAPM
-      - "2055:2055/udp" #NetFlow
+      - "5045:5045/udp" #Vago
+      - "9504:9504/udp" #BIFAPM
+      - "9528:9528/udp" #BIGAFM
+      - "2056:2056/udp" #NetFlow
     mem_limit: ${FB_MEM_LIMIT}
 
   logstash01:

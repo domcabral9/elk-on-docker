@@ -2,9 +2,9 @@ module_version: "1.0"
 
 var:
   - name: netflow_host
-    default: localhost
+    default: 0.0.0.0
   - name: netflow_port
-    default: 2055
+    default: 2056
   - name: max_message_size
     default: 10KiB
   - name: expiration_timeout
