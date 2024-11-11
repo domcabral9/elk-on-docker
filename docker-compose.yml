@@ -209,8 +209,8 @@ services:
       - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
       - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./modules_filebeat/f5.yml:/usr/share/filebeat/modules.d/f5.yml:ro"
-      - "./modules_filebeat/f5/bigipafm/manifest.yml:/usr/share/filebeat/module/f5/bigipafm/manifest.yml:ro"
+      # - "./modules_filebeat/f5.yml:/usr/share/filebeat/modules.d/f5.yml:ro"
+      # - "./modules_filebeat/f5/bigipafm/manifest.yml:/usr/share/filebeat/module/f5/bigipafm/manifest.yml:ro"
       # - "./modules_filebeat/netflow.yml:/usr/share/filebeat/modules.d/netflow.yml:ro"
       # - "./modules_filebeat/netflow/log/manifest.yml:/usr/share/filebeat/module/netflow/log/manifest.yml:ro"
       - "/etc/localtime:/etc/localtime:ro" # Sincroniza o horário do hospedeiro - Dedaleiro.
