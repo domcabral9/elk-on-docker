@@ -228,7 +228,7 @@ services:
       - "5045:5045/udp" #Vago
       - "9504:9504/udp" #BIFAPM
       - "9528:9528/udp" #BIGAFM
-      - "2056:2056/udp" #NetFlow
+      - "2056:2060/udp" #NetFlow
     mem_limit: ${FB_MEM_LIMIT}
 
   logstash01:
