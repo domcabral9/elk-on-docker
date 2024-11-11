@@ -1,4 +1,4 @@
-logging.level: debug
+# logging.level: debug
 
 filebeat.config.modules:
   enabled: true
