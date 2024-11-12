@@ -10,13 +10,13 @@ filebeat.inputs:
   paths:
     - ingest_data/*.log
 
-# - type: netflow
-#   max_message_size: 10KiB
-#   host: "0.0.0.0:2056"
-#   protocols: [ v5, v9, ipfix ]
-#   expiration_timeout: 30m
-#   queue_size: 8192
-#   detect_sequence_reset: true
+- type: netflow
+  max_message_size: 10KiB
+  host: "0.0.0.0:2056"
+  protocols: [ v5, v9, ipfix ]
+  expiration_timeout: 30m
+  queue_size: 8192
+  detect_sequence_reset: true
 
 
 # filebeat.inputs:
