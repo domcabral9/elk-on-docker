@@ -9,6 +9,8 @@ volumes:
     driver: local
   filebeatdata01:
     driver: local
+  packetbeatdata01:
+    driver: local
   logstashdata01:
     driver: local
   fleetserverdata:
@@ -237,7 +239,7 @@ services:
     user: root
     volumes:
       - certs:/usr/share/packetbeat/certs
-      - packetbeatdata:/usr/share/packetbeat/data
+      - packetbeatdata01:/usr/share/packetbeat/data
       - "./packetbeat.yml:/usr/share/packetbeat/packetbeat.yml:ro"  # Arquivo de configuração do Packetbeat
       - "/etc/localtime:/etc/localtime:ro"  # Sincroniza o horário do hospedeiro
       - "./timezone:/etc/timezone:ro"  # Arquivo do projeto com timezone
