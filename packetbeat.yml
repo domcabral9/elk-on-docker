@@ -16,9 +16,12 @@ packetbeat.flows:
 #     ports: [5432]
 
 setup.kibana:
-  host: ${KIBANA_HOSTS}
+  host: https://kibana:5601
   username: ${ELASTIC_USER}
   password: ${ELASTIC_PASSWORD}
+  ssl:
+    enabled: true
+    certificate_authorities: ${CA_CERT} 
 
 output.elasticsearch:
   hosts: ${ELASTIC_HOSTS}

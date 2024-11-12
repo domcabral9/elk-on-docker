@@ -237,9 +237,12 @@ services:
         condition: service_healthy
     image: docker.elastic.co/beats/packetbeat:${STACK_VERSION}
     user: root
+    privileged: true
     volumes:
       - certs:/usr/share/packetbeat/certs
       - packetbeatdata01:/usr/share/packetbeat/data
+      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./packetbeat.yml:/usr/share/packetbeat/packetbeat.yml:ro"  # Arquivo de configuração do Packetbeat
       - "/etc/localtime:/etc/localtime:ro"  # Sincroniza o horário do hospedeiro
       - "./timezone:/etc/timezone:ro"  # Arquivo do projeto com timezone
