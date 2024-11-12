@@ -1,0 +1,30 @@
+packetbeat.interfaces.device: any
+
+packetbeat.flows:
+  enabled: true
+  timeout: 30s
+  period: 10s
+
+# packetbeat.protocols:
+#   - type: http
+#     ports: [80, 8080, 9200, 5601]
+#   - type: dns
+#     ports: [53]
+#   - type: mysql
+#     ports: [3306]
+#   - type: pgsql
+#     ports: [5432]
+
+setup.kibana:
+  host: ${KIBANA_HOSTS}
+  username: ${ELASTIC_USER}
+  password: ${ELASTIC_PASSWORD}
+
+output.elasticsearch:
+  hosts: ${ELASTIC_HOSTS}
+  username: ${ELASTIC_USER}
+  password: ${ELASTIC_PASSWORD}
+  ssl:
+    enabled: true
+    certificate_authorities: ${CA_CERT}
+# logging.level: debug  # Defina para debug para verificar logs detalhados

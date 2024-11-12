@@ -209,10 +209,10 @@ services:
       - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
       - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      # - "./modules_filebeat/f5.yml:/usr/share/filebeat/modules.d/f5.yml:ro"
-      # - "./modules_filebeat/f5/bigipafm/manifest.yml:/usr/share/filebeat/module/f5/bigipafm/manifest.yml:ro"
-      - "./modules_filebeat/netflow.yml:/usr/share/filebeat/modules.d/netflow.yml:ro"
-      - "./modules_filebeat/netflow/log/manifest.yml:/usr/share/filebeat/module/netflow/log/manifest.yml:ro"
+      - "./modules_filebeat/f5.yml:/usr/share/filebeat/modules.d/f5.yml:ro"
+      - "./modules_filebeat/f5/bigipafm/manifest.yml:/usr/share/filebeat/module/f5/bigipafm/manifest.yml:ro"
+      # - "./modules_filebeat/netflow.yml:/usr/share/filebeat/modules.d/netflow.yml:ro"
+      # - "./modules_filebeat/netflow/log/manifest.yml:/usr/share/filebeat/module/netflow/log/manifest.yml:ro"
       - "/etc/localtime:/etc/localtime:ro" # Sincroniza o horário do hospedeiro - Dedaleiro.
       - ./timezone:/etc/timezone:ro" # Arquivo do projeto inserindo o timezone da região.
     environment:
@@ -225,11 +225,33 @@ services:
     command:
       -strict.perms=false
     ports:
-      - "5045:5045/udp" #Vago
       - "9504:9504/udp" #BIFAPM
       - "9528:9528/udp" #BIGAFM
       - "2056:2056/udp" #NetFlow
     mem_limit: ${FB_MEM_LIMIT}
+
+  packetbeat01:
+    depends_on:
+      es01:
+        condition: service_healthy
+    image: docker.elastic.co/beats/packetbeat:${STACK_VERSION}
+    user: root
+    volumes:
+      - certs:/usr/share/packetbeat/certs
+      - packetbeatdata:/usr/share/packetbeat/data
+      - "./packetbeat.yml:/usr/share/packetbeat/packetbeat.yml:ro"  # Arquivo de configuração do Packetbeat
+      - "/etc/localtime:/etc/localtime:ro"  # Sincroniza o horário do hospedeiro
+      - "./timezone:/etc/timezone:ro"  # Arquivo do projeto com timezone
+    environment:
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_HOSTS=https://dedaleiro-alone.setic.ro.gov.br:9200
+      - CA_CERT=certs/ca/ca.crt
+    command:
+      -strict.perms=false
+    ports:
+      - "5045:5045/udp" #Netflow
+    mem_limit: ${PB_MEM_LIMIT}
 
   logstash01:
     depends_on:
@@ -257,8 +279,8 @@ services:
       - ELASTIC_HOSTS=https://dedaleiro-alone.setic.ro.gov.br:9200
     command: logstash
     ports:
-      - "5044:5044/udp"
-      - "5046:5046/udp"
+      - "5044:5044/udp" #Fortigate
+      - "5046:5046/udp" #F5
     mem_limit: ${LS_MEM_LIMIT}
 
   fleet-server:
