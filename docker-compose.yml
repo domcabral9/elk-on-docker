@@ -15,6 +15,8 @@ volumes:
     driver: local
   fleetserverdata:
     driver: local
+  flowdata:
+    driver: local
 
 networks:
   default:
@@ -48,6 +50,12 @@ services:
           "  - name: es01\n"\
           "    dns:\n"\
           "      - dedaleiro-alone.setic.ro.gov.br\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: elasticflow\n"\
+          "    dns:\n"\
+          "      - elasticflow\n"\
           "      - localhost\n"\
           "    ip:\n"\
           "      - 127.0.0.1\n"\
@@ -127,6 +135,68 @@ services:
       timeout: 10s
       retries: 120
 
+  elasticflow:
+    depends_on:
+      es01:
+        condition: service_healthy
+    image: elastiflow/flow-collector:${FLOW_VERSION}
+    labels:
+      co.elastic.logs/module: elasticflow
+    restart: 'unless-stopped'
+    network_mode: 'host'
+    volumes:
+      - certs:/usr/share/elasticflow/config/certs
+      - flowdata:/usr/share/elasticflow/data
+      - /etc/elastiflow:/etc/elastiflow
+      - /var/lib/elastiflow/flowcoll:/var/lib/elastiflow/flowcoll
+    ports:
+      - ${FLOW_PORT}:9995
+    environment:
+      EF_LICENSE_ACCEPTED: 'false'   
+      EF_FLOW_SERVER_UDP_IP: '0.0.0.0'
+      EF_FLOW_SERVER_UDP_PORT: 9995
+      EF_AWS_VPC_FLOW_LOG_S3_ENABLE: 'false'
+      EF_PROCESSOR_ENRICH_APP_ID_ENABLE: 'false'
+      EF_PROCESSOR_ENRICH_APP_IPPORT_ENABLE: 'false'
+      EF_PROCESSOR_ENRICH_IPADDR_METADATA_ENABLE: 'false'
+      EF_PROCESSOR_ENRICH_IPADDR_DNS_ENABLE: 'false'
+      EF_PROCESSOR_ENRICH_IPADDR_DNS_NAMESERVER_IP: ''
+      EF_PROCESSOR_ENRICH_IPADDR_DNS_NAMESERVER_TIMEOUT: 3000
+      EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_ASN_ENABLE: 'false'
+      EF_PROCESSOR_ENRICH_IPADDR_MAXMIND_GEOIP_ENABLE: 'false'
+      EF_PROCESSOR_ENRICH_NETIF_METADATA_ENABLE: 'false'
+      EF_PROCESSOR_ENRICH_NETIF_FLOW_OPTIONS_ENABLE: 'true'
+      EF_PROCESSOR_ENRICH_NETIF_SNMP_ENABLE: 'false'
+      EF_PROCESSOR_ENRICH_NETIF_SNMP_COMMUNITIES: 'public'
+      # Elasticsearch
+      EF_OUTPUT_ELASTICSEARCH_ENABLE: 'true'
+      EF_OUTPUT_ELASTICSEARCH_ECS_ENABLE: 'true'
+      EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_SHARDS: 1
+      EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_REPLICAS: 0
+      # A comma separated list of Elasticsearch nodes to use. DO NOT include "http://" or "https://"
+      EF_OUTPUT_ELASTICSEARCH_ADDRESSES: 'dedaleiro-alone.setic.ro.gov.br:9200'
+      EF_OUTPUT_ELASTICSEARCH_USERNAME: 'elastic'
+      EF_OUTPUT_ELASTICSEARCH_PASSWORD: 'changeme'
+      EF_OUTPUT_ELASTICSEARCH_CLIENT_CA_CERT_FILEPATH: 'certs/ca/ca.crt'
+      #EF_OUTPUT_ELASTICSEARCH_CLIENT_CERT_FILEPATH: ''
+      #EF_OUTPUT_ELASTICSEARCH_CLIENT_KEY_FILEPATH: ''
+      EF_OUTPUT_ELASTICSEARCH_TLS_ENABLE: 'false'
+      EF_OUTPUT_ELASTICSEARCH_TLS_SKIP_VERIFICATION: 'false'
+      EF_OUTPUT_ELASTICSEARCH_TLS_CA_CERT_FILEPATH: ''
+      # OpenSearch
+      EF_OUTPUT_OPENSEARCH_ENABLE: 'false'
+      EF_OUTPUT_OPENSEARCH_ECS_ENABLE: 'false'
+      # Splunk
+      EF_OUTPUT_SPLUNK_HEC_ENABLE: 'false'
+      # Kafka
+      EF_OUTPUT_KAFKA_ENABLE: 'false'
+      EF_OUTPUT_KAFKA_SASL_ENABLE: 'false'
+      # Cribl
+      EF_OUTPUT_CRIBL_ENABLE: 'false'
+      # Generic HTTP
+      EF_OUTPUT_GENERIC_HTTP_ENABLE: 'false'
+    mem_limit: ${FLOW_MEM_LIMIT}
+   
   kibana:
     depends_on:
       es01:
