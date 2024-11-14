@@ -142,8 +142,8 @@ services:
     image: elastiflow/flow-collector:${FLOW_VERSION}
     labels:
       co.elastic.logs/module: elasticflow
-    restart: 'unless-stopped'
-    network_mode: 'host'
+    #restart: 'unless-stopped'
+    #network_mode: 'host'
     volumes:
       - certs:/usr/share/elasticflow/config/certs
       - flowdata:/usr/share/elasticflow/data
@@ -152,7 +152,9 @@ services:
     ports:
       - ${FLOW_PORT}:9995
     environment:
-      EF_LICENSE_ACCEPTED: 'false'   
+      EF_LICENSE_ACCEPTED: 'true'
+      EF_ACCOUNT_ID: '6735fe8e19857a07739e5661'
+      EF_FLOW_LICENSE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiI2NzM1ZmU4ZTE5ODU3YTA3NzM5ZTU2NjEiLCJleHAiOjE3NjMwNzg0MDAsImlzcyI6ImVsYXN0aWZsb3ciLCJzdWIiOiI2MDNkODUwMDMzZDg2YjA3OTE5YjE5Y2EiLCJwb2wiOiI2MDNkODgzMzMzZDg2YjA3OTE5YjE5Y2IiLCJjb3IiOjEsImx2bCI6MiwiZGlzYWJsZV9yaXNraXEiOmZhbHNlLCJ1bnQiOjEsInYiOiJ2MyJ9.S0FA_MUt42yHIr6x_sfxhSwfTVGsN4VIbdX1Xt3u4qg'  
       EF_FLOW_SERVER_UDP_IP: '0.0.0.0'
       EF_FLOW_SERVER_UDP_PORT: 9995
       EF_AWS_VPC_FLOW_LOG_S3_ENABLE: 'false'
