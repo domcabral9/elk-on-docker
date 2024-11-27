@@ -54,9 +54,18 @@ output {
       password => "${ELASTIC_PASSWORD}"
       cacert => "certs/ca/ca.crt"
     }
-  } else {
+  }else if [syslog][facility] == 0 {
+    elasticsearch {
+      index => "fortigate-trafego-logs-%{+YYYY.MM.dd}"
+      hosts => "${ELASTIC_HOSTS}"
+      user => "${ELASTIC_USER}"
+      password => "${ELASTIC_PASSWORD}"
+      cacert => "certs/ca/ca.crt"
+    }else {
     file {
       path => "/usr/share/logstash/logs/desconhecido_facility_logs.log"
+    
     }
   }
+}
 }
