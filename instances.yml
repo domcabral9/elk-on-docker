@@ -1,0 +1,25 @@
+instances:
+   - name: es01
+     dns:
+       - dedaleiro-alone.setic.ro.gov.br
+       - localhost
+     ip:
+       - 127.0.0.1
+   - name: kibana
+     dns:
+       - kibana
+       - localhost
+     ip:
+       - 127.0.0.1
+   - name: fleet-server
+     dns:
+       - dedaleiro-fleet.setic.ro.gov.br
+       - localhost
+     ip:
+       - 127.0.0.1
+   - name: elasticflow
+     dns:
+       - elasticflow
+       - localhost
+     ip:
+       - 127.0.0.1
