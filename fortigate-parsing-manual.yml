@@ -56,7 +56,7 @@ output {
     }
   }else if [syslog][facility] == 0 {
     elasticsearch {
-      index => "fortigate-trafego-logs-%{+YYYY.MM.dd}"
+      index => "fortigate-sistema-logs-%{+YYYY.MM.dd}"
       hosts => "${ELASTIC_HOSTS}"
       user => "${ELASTIC_USER}"
       password => "${ELASTIC_PASSWORD}"
