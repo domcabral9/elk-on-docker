@@ -15,10 +15,6 @@ filter {
     mutate {
       add_field => { "[@metadata][index_name]" => "fortigate-trafego-logs-%{+YYYY.MM.dd}" }
     }
-  } else if [syslog][facility] == "local0" {  # Facility Sistema
-    mutate {
-      add_field => { "[@metadata][index_name]" => "fortigate-sistema-logs-%{+YYYY.MM.dd}" }
-    }
   } else {
     mutate {
       add_tag => ["desconhecido_facility"]
