@@ -22,7 +22,7 @@ filter {
   } else {
     mutate {
       add_tag => ["desconhecido_facility"]
-      add_field => { "[@metadata][index_name]" => "fortigate-unknown-logs-%{+YYYY.MM.dd}" }
+      add_field => { "[@metadata][index_name]" => "fortigate-desconhecido-logs-%{+YYYY.MM.dd}" }
     }
   }
 }
