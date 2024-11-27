@@ -1,0 +1,46 @@
+input {
+  syslog {
+    host => "0.0.0.0"
+    port => 5044
+  }
+}
+
+filter {
+  # Condições baseadas no Facility do syslog
+  if [syslog][facility] == "local4" {  # Facility Segurança
+    mutate {
+      add_field => { "[@metadata][index_name]" => "fortigate-seguranca-logs-%{+YYYY.MM.dd}" }
+    }
+  } else if [syslog][facility] == "local5" {  # Facility Tráfego
+    mutate {
+      add_field => { "[@metadata][index_name]" => "fortigate-trafego-logs-%{+YYYY.MM.dd}" }
+    }
+  } else if [syslog][facility] == "local0" {  # Facility Sistema
+    mutate {
+      add_field => { "[@metadata][index_name]" => "fortigate-sistema-logs-%{+YYYY.MM.dd}" }
+    }
+  } else {
+    mutate {
+      add_tag => ["desconhecido_facility"]
+      add_field => { "[@metadata][index_name]" => "fortigate-unknown-logs-%{+YYYY.MM.dd}" }
+    }
+  }
+}
+
+output {
+  # Logs desconhecidos para arquivo local
+  if "desconhecido_facility" in [tags] {
+    file {
+      path => "/usr/share/logstash/logs/desconhecido_facility_logs.log"
+    }
+  } else {
+    # Logs conhecidos para Elasticsearch
+    elasticsearch {
+      index => "%{[@metadata][index_name]}"
+      hosts => "${ELASTIC_HOSTS}"
+      user => "${ELASTIC_USER}"
+      password => "${ELASTIC_PASSWORD}"
+      cacert => "certs/ca/ca.crt"
+    }
+  }
+}
