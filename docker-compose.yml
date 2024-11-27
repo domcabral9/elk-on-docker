@@ -47,32 +47,14 @@ services:
           echo "Creating certs";
           echo -ne \
           "instances:\n"\
-          "  - name: es01\n"\
-          "    dns:\n"\
-          "      - dedaleiro-alone.setic.ro.gov.br\n"\
-          "      - localhost\n"\
-          "    ip:\n"\
-          "      - 127.0.0.1\n"\
           "  - name: elasticflow\n"\
           "    dns:\n"\
           "      - elasticflow\n"\
           "      - localhost\n"\
           "    ip:\n"\
           "      - 127.0.0.1\n"\
-          "  - name: kibana\n"\
-          "    dns:\n"\
-          "      - kibana\n"\
-          "      - localhost\n"\
-          "    ip:\n"\
-          "      - 127.0.0.1\n"\
-          "  - name: fleet-server\n"\
-          "    dns:\n"\
-          "      - dedaleiro-fleet.setic.ro.gov.br\n"\
-          "      - localhost\n"\
-          "    ip:\n"\
-          "      - 127.0.0.1\n"\
-          > config/certs/instances.yml;
-          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
+          > config/certs/instances-elasticflow.yml;
+          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances-elasticflow.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
           unzip config/certs/certs.zip -d config/certs;
         fi;
         echo "Setting file permissions"
@@ -97,7 +79,7 @@ services:
         condition: service_healthy
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     labels:
-      co.elastic.logs/module: elasticsearch
+      co.elastic.logs/module: elasticsearch 
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - esdata01:/usr/share/elasticsearch/data
@@ -151,13 +133,13 @@ services:
       - /etc/elastiflow:/etc/elastiflow
       - /var/lib/elastiflow/flowcoll:/var/lib/elastiflow/flowcoll
     ports:
-      - ${FLOW_PORT}:9995
+      - ${FLOW_PORT}:2056/udp
     environment:
       EF_LICENSE_ACCEPTED: 'true'
       EF_ACCOUNT_ID: '6735fe8e19857a07739e5661'
       EF_FLOW_LICENSE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiI2NzM1ZmU4ZTE5ODU3YTA3NzM5ZTU2NjEiLCJleHAiOjE3NjMwNzg0MDAsImlzcyI6ImVsYXN0aWZsb3ciLCJzdWIiOiI2MDNkODUwMDMzZDg2YjA3OTE5YjE5Y2EiLCJwb2wiOiI2MDNkODgzMzMzZDg2YjA3OTE5YjE5Y2IiLCJjb3IiOjEsImx2bCI6MiwiZGlzYWJsZV9yaXNraXEiOmZhbHNlLCJ1bnQiOjEsInYiOiJ2MyJ9.S0FA_MUt42yHIr6x_sfxhSwfTVGsN4VIbdX1Xt3u4qg'  
       EF_FLOW_SERVER_UDP_IP: '0.0.0.0'
-      EF_FLOW_SERVER_UDP_PORT: 9995
+      EF_FLOW_SERVER_UDP_PORT: 2056
       EF_AWS_VPC_FLOW_LOG_S3_ENABLE: 'false'
       EF_PROCESSOR_ENRICH_APP_ID_ENABLE: 'false'
       EF_PROCESSOR_ENRICH_APP_IPPORT_ENABLE: 'false'
@@ -326,7 +308,7 @@ services:
       -strict.perms=false
     ports:
       - "5045:5045/udp" #Vago
-      - "2056:2056/udp" #NetFlow
+      # - "2056:2056/udp" #NetFlow
     mem_limit: ${PB_MEM_LIMIT}
 
   logstash01:
