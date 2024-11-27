@@ -38,7 +38,7 @@ filter {
 }
 
 output {
-  if [syslog][facility] == 4 {
+  if [syslog][facility] == 20 {
     elasticsearch {
       index => "fortigate-seguranca-logs-%{+YYYY.MM.dd}"
       hosts => "${ELASTIC_HOSTS}"
@@ -46,7 +46,7 @@ output {
       password => "${ELASTIC_PASSWORD}"
       cacert => "certs/ca/ca.crt"
     }
-  }else if [syslog][facility] == 5 {
+  }else if [syslog][facility] == 21 {
     elasticsearch {
       index => "fortigate-trafego-logs-%{+YYYY.MM.dd}"
       hosts => "${ELASTIC_HOSTS}"
@@ -54,7 +54,7 @@ output {
       password => "${ELASTIC_PASSWORD}"
       cacert => "certs/ca/ca.crt"
     }
-  }else if [syslog][facility] == 0 {
+  }else if [syslog][facility] == 16 {
     elasticsearch {
       index => "fortigate-sistema-logs-%{+YYYY.MM.dd}"
       hosts => "${ELASTIC_HOSTS}"
