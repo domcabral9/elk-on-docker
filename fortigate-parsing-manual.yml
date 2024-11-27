@@ -71,7 +71,7 @@ output {
   # Define índices diferentes com base no Facility
   if [fct][facility] == 16 {  # local0
     elasticsearch {
-      index => "fortigate-system-logs-%{+YYYY.MM.dd}"
+      index => "fortigate-sistema-logs-%{+YYYY.MM.dd}"
       hosts => "${ELASTIC_HOSTS}"
       user => "${ELASTIC_USER}"
       password => "${ELASTIC_PASSWORD}"
@@ -79,7 +79,7 @@ output {
     }
   } else if [fct][facility] == 17 {  # local1
     elasticsearch {
-      index => "fortigate-security-logs-%{+YYYY.MM.dd}"
+      index => "fortigate-seguranca-logs-%{+YYYY.MM.dd}"
       hosts => "${ELASTIC_HOSTS}"
       user => "${ELASTIC_USER}"
       password => "${ELASTIC_PASSWORD}"
@@ -87,7 +87,7 @@ output {
     }
   } else if [fct][facility] == 18 {  # local2
     elasticsearch {
-      index => "fortigate-traffic-logs-%{+YYYY.MM.dd}"
+      index => "fortigate-trafego-logs-%{+YYYY.MM.dd}"
       hosts => "${ELASTIC_HOSTS}"
       user => "${ELASTIC_USER}"
       password => "${ELASTIC_PASSWORD}"
