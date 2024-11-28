@@ -1,0 +1,86 @@
+input {
+  udp {
+    host => "0.0.0.0"
+    port => 5044
+  }
+}
+
+filter {
+  mutate {
+    add_field => ["[event][created]", "%{@timestamp}"] # event.created: when the event is created by logstash
+  }
+  
+  # Captura o PRI do syslog e separa a mensagem
+  grok {
+    match => ["[event][original]", "<%{NUMBER:syslog_pri}>%{GREEDYDATA:[@metadata][message]}"]
+    tag_on_failure => ["fortinet_grok_failure"]
+  }
+
+  if "fortinet_grok_failure" not in [tags] {
+    # Calcula a Facility e o Severity a partir do PRI
+    ruby {
+      code => "
+        pri = event.get('syslog_pri').to_i
+        facility = pri / 8
+        severity = pri % 8
+        event.set('facility_code', facility)
+        event.set('severity_code', severity)
+      "
+    }
+
+    kv {
+      source => "[@metadata][message]"
+      value_split => "="
+      field_split => " "
+      whitespace => strict
+      target => "fct"
+    }
+
+    # Ajusta o timezone se não estiver presente
+    if ![fct][tz] {
+      mutate {
+        replace => {"[fct][tz]" => "-0500"}
+        add_tag => ["setting_default_timezone"]
+      }
+    }
+
+    mutate {
+      replace => {"[@metadata][timestamp]" => "%{[fct][date]} %{[fct][time]} %{[fct][tz]}"}
+    }
+
+    date {
+      match => ["[@metadata][timestamp]", "yyyy-MM-dd HH:mm:ss Z"]
+      target => "@timestamp"
+    }
+  }
+}
+
+output {
+  # Condição para envio ao índice correto com base no código da facility
+  if [facility_code] == 20 {
+    elasticsearch {
+      index => "fortigate-trafego-logs-%{+YYYY.MM.dd}"
+      hosts => "${ELASTIC_HOSTS}"
+      user => "${ELASTIC_USER}"
+      password => "${ELASTIC_PASSWORD}"
+      cacert => "certs/ca/ca.crt"
+    }
+  } else if [facility_code] == 21 {
+    elasticsearch {
+      index => "fortigate-seguranca-logs-%{+YYYY.MM.dd}"
+      hosts => "${ELASTIC_HOSTS}"
+      user => "${ELASTIC_USER}"
+      password => "${ELASTIC_PASSWORD}"
+      cacert => "certs/ca/ca.crt"
+    }
+  } else {
+    # Logs com facility desconhecida
+    elasticsearch {
+      index => "fortigate-desconhecido-logs-%{+YYYY.MM.dd}"
+      hosts => "${ELASTIC_HOSTS}"
+      user => "${ELASTIC_USER}"
+      password => "${ELASTIC_PASSWORD}"
+      cacert => "certs/ca/ca.crt"
+    }
+  }
+}
