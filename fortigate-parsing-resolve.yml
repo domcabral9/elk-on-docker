@@ -1,0 +1,67 @@
+input {
+  udp {
+    host => "0.0.0.0"
+    port => 5044
+  }
+}
+
+filter {
+  # Filtro Grok para capturar o PRI e a mensagem de log
+  grok {
+    match => { "message" => "<(?<pri>\d{3})>.*" }
+  }
+
+  # Filtro Ruby para calcular o facility com base no PRI
+  ruby {
+  code => '
+    pri_value = event.get("pri")
+    if pri_value && pri_value.is_a?(String) && pri_value.match(/^\d+$/)
+      pri_value = pri_value.to_i
+      # Calcula o facility a partir do PRI (facility = PRI / 8)
+      facility = pri_value / 8
+      event.set("[syslog][facility]", facility)
+      event.set("[syslog][pri]", pri_value) # Para debug
+      event.tag("fortigate")  # Marca o log como Fortigate
+    else
+      # Se PRI for inválido ou não existir, marca como desconhecido
+      event.set("[syslog][facility]", "desconhecido")
+      event.tag("desconhecido_facility")
+    end
+  '
+}
+
+  # Verificação do tipo de log para configurar o índice apropriado
+  ruby {
+    code => '
+      # Garantir que o tipo seja atribuído
+      type = event.get("[event][type]") || "unknown"
+      case type
+      when "traffic"
+        event.set("[@metadata][index_name]", "fortigate-trafego-logs-%{+YYYY.MM.dd}")
+      when "system"
+        event.set("[@metadata][index_name]", "fortigate-sistema-logs-%{+YYYY.MM.dd}")
+      when "security"
+        event.set("[@metadata][index_name]", "fortigate-seguranca-logs-%{+YYYY.MM.dd}")
+      else
+        event.set("[@metadata][index_name]", "fortigate-default-logs-%{+YYYY.MM.dd}")
+      end
+    '
+  }
+}
+
+# Output para Elasticsearch ou arquivo de logs desconhecidos
+output {
+  if "processing_desconhecido_facility" in [tags] {
+    file {
+      path => "/usr/share/logstash/logs/desconhecido_facility_logs.log"
+    }
+  } else {
+    elasticsearch {
+      index => "%{[@metadata][index_name]}"
+      hosts => "${ELASTIC_HOSTS}"
+      user => "${ELASTIC_USER}"
+      password => "${ELASTIC_PASSWORD}"
+      cacert => "certs/ca/ca.crt"
+    }
+  }
+}
