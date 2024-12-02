@@ -6,7 +6,9 @@ metricbeat.modules:
 - module: elasticsearch
   xpack.enabled: true
   period: 10s
-  hosts: ${ELASTIC_HOSTS}
+  hosts:
+    - https://dedaleiro-alone.setic.ro.gov.br:9200  # es01
+    - https://es02:9200                             # es02
   username: ${ELASTIC_USER}
   password: ${ELASTIC_PASSWORD}
   ssl:
@@ -55,4 +57,3 @@ output.elasticsearch:
   ssl:
     enabled: true
     certificate_authorities: ${CA_CERT}
-
