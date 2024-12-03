@@ -208,7 +208,7 @@ services:
       EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_SHARDS: 1
       EF_OUTPUT_ELASTICSEARCH_INDEX_TEMPLATE_REPLICAS: 0
       # A comma separated list of Elasticsearch nodes to use. DO NOT include "http://" or "https://"
-      EF_OUTPUT_ELASTICSEARCH_ADDRESSES: 'https://dedaleiro-alone.setic.ro.gov.br:9200'
+      EF_OUTPUT_ELASTICSEARCH_ADDRESSES: 'dedaleiro-alone.setic.ro.gov.br:9200'
       EF_OUTPUT_ELASTICSEARCH_USERNAME: 'elastic'
       EF_OUTPUT_ELASTICSEARCH_PASSWORD: 'changeme'
       EF_OUTPUT_ELASTICSEARCH_CLIENT_CA_CERT_FILEPATH: '/usr/share/elasticflow/config/certs/ca/ca.crt'
