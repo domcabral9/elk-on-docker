@@ -1,3 +1,4 @@
 # Ignore os arquivos de ambiente com chaves
 .env
 cortex.py
+docker-compose.yml
