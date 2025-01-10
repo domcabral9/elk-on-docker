@@ -31,7 +31,7 @@ def test_advanced_authentication(api_key_id, api_key):
 
     # Fazer a requisição
     res = requests.post(
-        url="https://api-setic.xdr.us.paloaltonetworks.com/public_api/v1/alerts/get_alerts",
+        url="https://api-<YOU-ORGANIZATION>.xdr.us.paloaltonetworks.com/public_api/v1/alerts/get_alerts",
         headers=headers,
         json=parameters
     )
@@ -39,5 +39,5 @@ def test_advanced_authentication(api_key_id, api_key):
 
 # Substituir pelos seus valores
 api_key_id = "4"  # Exemplo
-api_key = "VoYSDlrdNelmN10Bk116TVNnp66YRaAQrYPxEhzL0s4CDh60c8Boyr8czdwv7MqcrmVNw6Q55gGhTui1JkzdpOpwAdwkIyP61uB9hjqWNJIOundO4qVwq0ZfbYU35qRa"
+api_key = "INPUT YOUR KEY HERE"
 print(test_advanced_authentication(api_key_id, api_key))
